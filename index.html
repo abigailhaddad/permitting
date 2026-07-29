@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Federal jobs that mention "permitting"</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+         margin: 2rem auto; max-width: 1200px; padding: 0 1rem; color: #1a1a2e; }
+  h1 { font-size: 1.5rem; }
+  p.note { color: #555; max-width: 70ch; }
+  table.dataTable td { font-size: 0.9rem; }
+  .filters { margin: 1rem 0; display: flex; gap: 1rem; flex-wrap: wrap; }
+  .filters label { font-size: 0.9rem; }
+  select { padding: 0.25rem; }
+</style>
+</head>
+<body>
+<h1>Federal jobs that mention &ldquo;permitting&rdquo;</h1>
+<p class="note">Every USAJOBS announcement from 2017 through March 2026 whose
+full text contains the word &ldquo;permitting.&rdquo; Use the search box to
+filter (try an agency name, a job title, or a year). &ldquo;Probably
+incidental&rdquo; means every mention in that posting looked like a stock
+phrase such as &ldquo;weather permitting&rdquo; &mdash; not permitting as part
+of the job. Click any link to open the announcement on USAJOBS (older ones
+may have expired).</p>
+<div class="filters">
+  <label>Mention type:
+    <select id="mtype">
+      <option value="">All</option>
+      <option value="real mention">Real mention</option>
+      <option value="probably incidental">Probably incidental</option>
+    </select>
+  </label>
+  <label>Year:
+    <select id="year"><option value="">All</option></select>
+  </label>
+</div>
+<table id="jobs" class="display" style="width:100%">
+  <thead>
+    <tr><th>Year</th><th>Month</th><th>Job title</th><th>Agency</th><th>Department</th><th>Mention type</th><th>Link</th></tr>
+  </thead>
+</table>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+<script src="data.js"></script>
+<script>
+  var table = $('#jobs').DataTable({
+    data: JOBS,
+    pageLength: 50,
+    order: [[1, 'desc']],
+    columns: [
+      { data: 'year' },
+      { data: 'month' },
+      { data: 'title' },
+      { data: 'agency' },
+      { data: 'department' },
+      { data: 'mention_type' },
+      { data: 'link', render: function(d) { return '<a href="' + d + '" target="_blank">open</a>'; } }
+    ]
+  });
+  var years = [];
+  JOBS.forEach(function(j) { if (years.indexOf(j.year) === -1) years.push(j.year); });
+  years.sort();
+  years.forEach(function(y) { $('#year').append('<option value="' + y + '">' + y + '</option>'); });
+  $('#mtype').on('change', function() { table.column(5).search(this.value).draw(); });
+  $('#year').on('change', function() { table.column(0).search(this.value).draw(); });
+</script>
+</body>
+</html>
