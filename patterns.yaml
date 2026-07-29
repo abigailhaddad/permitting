@@ -1,0 +1,105 @@
+# All classification and search patterns live here. Edit this file, then run
+# `python3 classify.py` to re-classify (fast, local, no re-scan needed).
+#
+# How a posting gets its mention_type:
+#   1. If ANY of its "permitting" contexts matches real_overrides -> real mention
+#   2. Else if EVERY context matches an incidental pattern       -> probably incidental
+#   3. Else                                                      -> real mention
+
+incidental:
+  # "<word> permitting" meaning "if <word> allows" (stock phrases)
+  stock_phrases:
+    - weather
+    - time
+    - schedule
+    - workload
+    - budget
+    - funding
+    - funds
+    - resources
+    - space
+    - conditions
+    - circumstances
+    - staffing
+    - census
+    - mission
+    - operations
+    - duties
+
+  # "permitting <word>" where permitting is a verb ("...a waiver determination
+  # permitting you to retain bank securities" -- OCC pastes that into every
+  # announcement). Single words that can follow verb-use "permitting".
+  verb_following_words:
+    - you
+    - them
+    - him
+    - her
+    - it
+    - us
+    - the
+    - a
+    - an
+    - such
+    - these
+    - those
+    - this
+    - that
+    - each
+    - all
+    - any
+    - access
+    - use
+    - employees
+    - new
+    - current
+    - retention
+    - greater
+    - more
+    - entry
+    - work    # "AFI 36-2104 permitting work on ... nuclear devices"
+
+# If any context matches one of these (substring, case-insensitive), the
+# posting is a real mention no matter what the incidental rules say.
+real_overrides:
+  - environmental permitting
+  - environmental media permitting
+  - air permitting
+  - water permitting
+  - npdes permitting
+  - mbta permitting
+  - federal permitting
+  - project permitting
+  - regulatory permitting
+  - use permitting
+  - permitting and compliance
+  - permitting process
+  - permitting program
+  - permitting requirements
+  - permitting actions
+  - permitting activities
+  - permitting and taxation          # TTB's Permitting Division (alcohol/tobacco permits)
+  - certificates permitting the movement   # APHIS: issuing movement certificates IS permit work
+
+# Phrases for finding permitting-work jobs whose text never says "permitting".
+# Used by scan_expanded.sh (historical corpus) and update_current.sh (open jobs).
+# CANDIDATES -- review before trusting; several (NEPA, environmental review)
+# will also pull in environmental-review jobs that are only permitting-adjacent.
+expansion_phrases:
+  - permitting            # keeps the original word so one list drives everything
+  - environmental review
+  - national environmental policy act
+  - " nepa "
+  - clean water act
+  - section 404
+  - section 401
+  - npdes
+  - special use permit
+  - right-of-way grant
+  - incidental take permit
+  - dredge and fill
+  - environmental impact statement
+  - environmental assessment
+  - categorical exclusion
+  - section 106           # National Historic Preservation Act
+  - section 7 consultation # Endangered Species Act
+  - fast-41

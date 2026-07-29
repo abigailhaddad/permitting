@@ -28,18 +28,36 @@ searchable and filterable, no Excel needed.
 bash update_current.sh
 ```
 
-That writes `results/current_permitting_jobs.csv` — currently open positions,
-found two ways (the `how_found` column says which):
-
-- **text match** — the live announcement record contains "permitting"
-- **agency+series profile** — the job's agency + occupational series is a
-  combo that historically posts real permitting jobs (the profile is
-  `reference/permitting_agency_series.csv`, built from the historical data;
-  this catches permitting-ish jobs even when the word isn't in the record)
-
-It reads the live-jobs mirror maintained by the
+That writes `results/current_permitting_jobs.csv` — currently open positions
+whose records match any phrase in the `expansion_phrases` list in
+**`patterns.yaml`** (the word "permitting" itself, plus phrases like
+"environmental review" and "special use permit" that permitting jobs use even
+when they skip the word). The `matched_phrases` column shows why each job was
+included. It reads the live-jobs mirror maintained by the
 [usajobs_historical](https://github.com/abigailhaddad/usajobs_historical)
 pipeline, so "current" is as fresh as that pipeline's last run.
+
+## Tuning the rules (no re-scan needed)
+
+All judgment calls live in **`patterns.yaml`**:
+
+- which "permitting" mentions are incidental (stock phrases like "weather
+  permitting", verb uses like OCC's "waiver determination permitting you to
+  retain bank securities" that appears in every OCC announcement)
+- overrides that force specific phrasings to count as real (TTB's "permitting
+  and taxation" division, APHIS's "certificates permitting the movement")
+- the `expansion_phrases` used to find permitting jobs that never say
+  "permitting"
+
+Edit the YAML, then run `python3 classify.py` — it re-classifies everything
+and rebuilds the spreadsheet, web page, and per-year counts in seconds.
+
+To apply the expansion phrases to the whole historical corpus (find jobs that
+never say "permitting" at all), run `bash scan_expanded.sh` (~1 hour) —
+results land in `results/expanded_hits.csv` with a `matched_phrases` column.
+Review `expansion_phrases` in the YAML first; the current list is a starting
+point and the environmental-review phrases will also catch
+permitting-adjacent jobs.
 
 ## How the historical data was built (coders)
 
