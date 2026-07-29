@@ -86,20 +86,47 @@ real_overrides:
 # will also pull in environmental-review jobs that are only permitting-adjacent.
 expansion_phrases:
   - permitting            # keeps the original word so one list drives everything
+  # environmental review framework
   - environmental review
   - national environmental policy act
   - " nepa "
-  - clean water act
-  - section 404
-  - section 401
-  - npdes
-  - special use permit
-  - right-of-way grant
-  - incidental take permit
-  - dredge and fill
   - environmental impact statement
   - environmental assessment
   - categorical exclusion
+  - finding of no significant impact
+  - record of decision
+  - environmental compliance
+  # statutes and programs (mined from real permitting postings' contexts)
+  - clean water act
+  - clean air act
+  - safe drinking water act
+  - rivers and harbors act
+  - rcra
+  - cercla
+  - npdes
+  - national pollutant discharge elimination system
+  - coastal zone management act
+  - marine mammal protection act
+  - section 404
+  - section 401
+  - section 408
   - section 106           # National Historic Preservation Act
   - section 7 consultation # Endangered Species Act
+  - water quality certification
   - fast-41
+  # permit work by other names
+  - special use permit
+  - permit applications
+  - permit issuance
+  - permit review
+  - permit processing
+  - permits and licenses
+  - licenses and permits
+  - permit to drill
+  - leasing and permitting
+  - right-of-way
+  - rights-of-way
+  - dredge and fill
+  - incidental take
+  - habitat conservation plan
+  - biological opinion
