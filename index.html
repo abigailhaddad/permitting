@@ -80,8 +80,9 @@ posting's call; click one to read the mentions. All rules:
     attachTip('tipIncidental',
       'Every mention is "<word> permitting" (' + RULES.stock.join(', ') +
       ') or a verb use like "permitting ' + RULES.verb.slice(0, 8).join('/') + '/…".');
+    const coreTerms = RULES.core.filter(function(w) { return w !== 'permitting'; });
     attachTip('tipLikely',
-      'Does not say "permitting" but matches any of these on its own: ' + RULES.core.join(', ') +
+      'Does not say "permitting" but matches any of these on its own: ' + coreTerms.join(', ') +
       '. Or ' + RULES.threshold + '+ of: ' + RULES.adjacent.join(', ') + '.');
   }
 
