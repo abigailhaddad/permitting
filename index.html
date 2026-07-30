@@ -57,7 +57,7 @@ the call; click one to read the mentions. Rules:
   ];
 
   function seriesTooltip(series) {
-    if (!series) return '';
+    if (!series || typeof SERIES_NAMES === 'undefined') return series || '';
     return series.split(' | ')
       .map(function(code) { return code + ' ' + (SERIES_NAMES[code] || ''); })
       .join('; ');
