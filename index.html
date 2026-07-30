@@ -26,7 +26,9 @@ current jobs API). Each posting is one of:</p>
 </ul>
 <p class="note">Hover a mention type in the table for the words behind that
 posting's call; click one to read the mentions. All rules:
-<a href="https://github.com/abigailhaddad/permitting/blob/main/patterns.yaml">patterns.yaml</a>.</p>
+<a href="https://github.com/abigailhaddad/permitting/blob/main/patterns.yaml">patterns.yaml</a>
+&middot; Code and data:
+<a href="https://github.com/abigailhaddad/permitting">github.com/abigailhaddad/permitting</a>.</p>
 <div id="toolbarButtons" class="mb-2"></div>
 <div class="filters-bar-container">
   <div class="filters-bar" id="topFiltersBar">
@@ -146,14 +148,22 @@ posting's call; click one to read the mentions. All rules:
       maintainAspectRatio: false,
       plugins: {
         legend: { display: false },
-        title: { display: true, text: 'Postings per month (filtered)', color: '#555', font: { weight: 'normal' } }
+        title: { display: true, text: 'Postings per month (filtered)', color: '#555', font: { weight: 'normal' } },
+        tooltip: { callbacks: { title: function(items) { return fmtMonth(items[0].label); } } }
       },
       scales: {
-        x: { grid: { display: false }, ticks: { maxTicksLimit: 14, maxRotation: 0, color: '#777' } },
+        x: { grid: { display: false }, ticks: { maxTicksLimit: 14, maxRotation: 0, color: '#777',
+             callback: function(value) { return fmtMonth(this.getLabelForValue(value)); } } },
         y: { beginAtZero: true, grid: { color: '#eee' }, ticks: { precision: 0, color: '#777' } }
       }
     }
   });
+
+  const MONTH_ABBR = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  function fmtMonth(m) {
+    const parts = m.split('_');
+    return MONTH_ABBR[Number(parts[1]) - 1] + ' ' + parts[0];
+  }
 
   function updateChart() {
     const counts = {};
