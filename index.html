@@ -17,14 +17,14 @@
 <h1>Federal jobs that mention &ldquo;permitting&rdquo;</h1>
 <p class="note">Every USAJOBS announcement from 2017 through March 2026 whose
 full text contains the word &ldquo;permitting.&rdquo; Hover a mention type to
-see which specific words drove the call; click &ldquo;mentions&rdquo; to read
+see which specific words drove the call; click it to read
 the actual text around each mention. Rules live in
 <a href="https://github.com/abigailhaddad/permitting/blob/main/patterns.yaml">patterns.yaml</a>.
 Older announcement links have expired.</p>
 <div id="toolbarButtons" class="mb-2"></div>
 <table id="jobs" class="table table-striped" style="width:100%">
   <thead>
-    <tr><th>Year</th><th>Month</th><th>Job title</th><th>Agency</th><th>Department</th><th>Series</th><th>Mention type</th><th>Mentions</th><th>Link</th></tr>
+    <tr><th>Year</th><th>Month</th><th>Job title</th><th>Agency</th><th>Department</th><th>Series</th><th>Mention type</th><th>Link</th></tr>
   </thead>
   <tbody></tbody>
 </table>
@@ -54,8 +54,7 @@ Older announcement links have expired.</p>
         '<td>' + escapeHtml(job.agency) + '</td>' +
         '<td>' + escapeHtml(job.department) + '</td>' +
         '<td>' + escapeHtml(job.series) + '</td>' +
-        '<td><span class="mention-cell" title="' + escapeHtml(job.why) + '">' + escapeHtml(job.mention_type) + '</span></td>' +
-        '<td><a href="#" class="view-mentions">mentions</a></td>' +
+        '<td><a href="#" class="mention-cell view-mentions" title="' + escapeHtml(job.why) + '">' + escapeHtml(job.mention_type) + '</a></td>' +
         '<td><a href="' + escapeHtml(job.link) + '" target="_blank">View</a></td>' +
         '</tr>';
     });
@@ -72,7 +71,7 @@ Older announcement links have expired.</p>
       order: [[1, 'desc']],
       dom: 'rtip',
       columnDefs: [
-        { targets: [7, 8], orderable: false, searchable: false }
+        { targets: 7, orderable: false, searchable: false }
       ]
     },
     fieldTypes: {

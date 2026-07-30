@@ -17,7 +17,7 @@ COPY (
   SELECT positionTitle AS title,
          hiringAgencyName AS agency,
          hiringDepartmentName AS department,
-         regexp_extract(JobCategories::varchar, '[0-9]{4}') AS series,
+         array_to_string(regexp_extract_all(JobCategories::varchar, '[0-9]{4}'), ' | ') AS series,
          positionOpenDate AS opens,
          positionCloseDate AS closes,
          list_distinct(regexp_extract_all(lower(CAST(MatchedObjectDescriptor AS VARCHAR)), '$RX')) AS matched_phrases,

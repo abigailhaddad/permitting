@@ -8,7 +8,7 @@ LOAD httpfs;
 CREATE TABLE hits AS SELECT * FROM read_csv('results/permitting_hits.csv', header=true, all_varchar=true);
 CREATE TABLE ag AS
 SELECT usajobsControlNumber::varchar AS control, hiringAgencyName, hiringDepartmentName,
-       regexp_extract(JobCategories, '[0-9]{4}') AS series
+       array_to_string(regexp_extract_all(JobCategories, '[0-9]{4}'), ' | ') AS series
 FROM read_parquet($(python3 -c "print('[' + ', '.join(chr(39) + u.strip() + chr(39) for u in open('reference/r2_historical_urls.txt')) + ']')"),
   union_by_name=true);
 COPY (
