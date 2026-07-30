@@ -78,9 +78,10 @@ final CSVs + viewer data (`data.js`, `contexts.js`).
 
 ## Caveats
 
-- The incidental/real rules were tuned by reading snippets, not by labeling a
-  gold set. Skim `permitting_contexts.csv` (or click through mention types in
-  the viewer) before leaning on the split for anything load-bearing.
+- We wrote the incidental/real rules by reading snippets until the calls
+  looked right — nobody has hand-checked a random sample to measure how often
+  they're wrong. Skim `permitting_contexts.csv` (or click through mention
+  types in the viewer) before leaning on the split for anything important.
 - Counts are raw. Federal posting volume collapsed in 2025, so trends need a
   denominator.
 - A job can do permitting work without using any term we search for; the
