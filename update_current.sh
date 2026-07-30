@@ -8,8 +8,11 @@
 # Output: results/current_permitting_jobs.csv (open in Excel/Google Sheets)
 cd "$(dirname "$0")"
 RX=$(python3 build_rx.py)
-duckdb -c "
+ok=0
+for attempt in 1 2 3; do
+  if duckdb -c "
 LOAD httpfs;
+SET http_retries=5;
 COPY (
   SELECT positionTitle AS title,
          hiringAgencyName AS agency,
@@ -23,5 +26,15 @@ COPY (
   WHERE regexp_matches(lower(CAST(MatchedObjectDescriptor AS VARCHAR)), '$RX')
   ORDER BY agency, title
 ) TO 'results/current_permitting_jobs.csv' (HEADER);
-"
+"; then
+    ok=1
+    break
+  fi
+  echo "attempt $attempt failed (transient R2 read error is common), retrying..."
+  sleep $((attempt * 10))
+done
+if [ $ok -eq 0 ]; then
+  echo "ERROR: all attempts failed; results/current_permitting_jobs.csv NOT updated" >&2
+  exit 1
+fi
 echo "Wrote results/current_permitting_jobs.csv ($(($(wc -l < results/current_permitting_jobs.csv) - 1)) currently-listed jobs)"

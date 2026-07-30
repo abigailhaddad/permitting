@@ -27,11 +27,22 @@ overrides = [o.lower() for o in P['real_overrides']]
 
 
 def classify_contexts(contexts):
-    if any(o in c for c in contexts for o in overrides):
-        return 'real mention'
-    if all(stock.search(c) or verb.search(c) for c in contexts):
-        return 'probably incidental'
-    return 'real mention'
+    """Return (mention_type, why) -- why lists the specific matched words."""
+    hit_overrides = sorted(set(o for c in contexts for o in overrides if o in c))
+    if hit_overrides:
+        return 'real mention', 'matched: ' + '; '.join(hit_overrides)
+    incidental_hits = set()
+    all_incidental = True
+    for c in contexts:
+        m = stock.search(c) or verb.search(c)
+        if m:
+            incidental_hits.add(m.group(0))
+        else:
+            all_incidental = False
+    if contexts and all_incidental:
+        return 'probably incidental', 'only matched: ' + '; '.join(sorted(incidental_hits))
+    return 'real mention', 'mention(s) not matching any incidental pattern' + (
+        '; incidental matches too: ' + '; '.join(sorted(incidental_hits)) if incidental_hits else '')
 
 
 ctx_by_job = defaultdict(list)
@@ -41,26 +52,28 @@ for row in csv.DictReader(open('results/permitting_contexts.csv')):
 rows = []
 for row in csv.DictReader(open('results/permitting_jobs_base.csv')):
     contexts = ctx_by_job.get(row['usajobsControlNumber'], [])
-    row['mention_type'] = classify_contexts(contexts) if contexts else 'real mention'
+    if contexts:
+        row['mention_type'], row['why'] = classify_contexts(contexts)
+    else:
+        row['mention_type'], row['why'] = 'real mention', 'no context captured'
     rows.append(row)
 
 cols = ['year', 'month', 'title', 'agency', 'department', 'series', 'mention_type', 'link', 'usajobsControlNumber']
 with open('results/permitting_jobs.csv', 'w', newline='') as f:
-    w = csv.DictWriter(f, fieldnames=cols)
+    w = csv.DictWriter(f, fieldnames=cols, extrasaction='ignore')
     w.writeheader()
     w.writerows(rows)
 
-full = yaml.safe_load(open('patterns.yaml'))
-patterns = {
-    'stock_phrases': full['incidental']['stock_phrases'],
-    'verb_following_words': full['incidental']['verb_following_words'],
-    'real_overrides': full['real_overrides'],
-}
 with open('data.js', 'w') as f:
     f.write('const JOBS = ')
     json.dump(rows, f)
-    f.write(';\nconst PATTERNS = ')
-    json.dump(patterns, f)
+    f.write(';')
+
+# contexts.js: control number -> list of text snippets, lazy-loaded by the
+# viewer's "view mentions" modal
+with open('contexts.js', 'w') as f:
+    f.write('var CONTEXTS = ')
+    json.dump({k: v for k, v in ctx_by_job.items()}, f)
     f.write(';')
 
 by_year = Counter(r['year'] for r in rows)
