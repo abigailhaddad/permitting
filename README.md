@@ -1,93 +1,87 @@
-# Federal jobs that mention "permitting"
+# Federal permitting jobs
 
-Every federal job announcement posted on USAJOBS from 2017 through March 2026
-whose full text contains the word **"permitting"** (~8,800 postings), plus an
-expanded search for permitting-work jobs that never use the word, plus a
-one-command way to find **currently open** permitting jobs.
+Which federal jobs involve permitting work, 2017 to now.
 
-## If you just want the data (no coding needed)
+Browse it: **https://abigailhaddad.github.io/permitting/**
 
-**Open `results/permitting_jobs.csv`** — it opens in Excel or Google Sheets.
-One row per historical posting:
+## What we did
 
-| Column | What it means |
+1. **Searched the full text of ~2M USAJOBS announcements** (2017–March 2026,
+   the [`loyoladatamining/usajobs`](https://huggingface.co/datasets/loyoladatamining/usajobs)
+   dataset) for the word "permitting" — 8,827 postings — and saved the ±120
+   characters around every occurrence.
+
+2. **Read the snippets and wrote rules for which mentions are real.** Lots of
+   announcements say "permitting" without the job involving permits:
+   "weather permitting," "budget permitting," and OCC's ethics clause
+   ("a waiver determination **permitting** you to retain bank securities"),
+   which appears in every OCC announcement and alone accounted for ~2,400
+   postings. A mention is *incidental* if it's "<word> permitting" from a
+   known list (weather, budget, time, …) or "permitting <pronoun/article>"
+   (verb use). A posting is `probably incidental` only if *every* mention is
+   incidental; anything else is a `real mention`. A short override list
+   forces phrasings we checked by hand to count (TTB's Permitting Division;
+   APHIS "issues certificates permitting the movement of regulated
+   articles"). Split: **4,677 real / 4,150 probably incidental**.
+
+3. **Ran a second search for permitting work that skips the word.** From the
+   real postings' snippets we collected the vocabulary that co-occurs with
+   permitting (NEPA, NPDES, section 404, special use permits, …) and searched
+   the corpus again — 50,327 postings. Each is flagged `likely permitting`
+   (matched a precise term like "permit applications" or NPDES, or 2+ broader
+   ones like NEPA + Clean Water Act) or `adjacent mention` (one broad term
+   only — often environmental-review compliance rather than permitting).
+
+4. **Joined agency, department, and occupational series** for every posting
+   from the [usajobs_historical](https://github.com/abigailhaddad/usajobs_historical)
+   R2 mirror, by control number.
+
+5. **Built the same thing for currently open jobs** — `update_current.sh`
+   applies the step-3 vocabulary to the live current-jobs mirror.
+
+Every list and threshold from steps 2–3 lives in **`patterns.yaml`**. Edit it
+and rerun the classifiers (seconds, no re-searching) to change what counts.
+
+## The data
+
+| File | What it is |
 |---|---|
-| year, month | When the job was posted (`2023_04` = April 2023) |
-| title | The job title |
-| agency, department | Who was hiring |
-| series | Occupational series code (e.g. 0401 = biologist) |
-| mention_type | `real mention` = permitting looks like part of the job. `probably incidental` = every mention was a stock phrase ("weather permitting") or verb use ("a waiver permitting you to…") |
-| link | Opens the announcement on USAJOBS (closed jobs still display, marked as closed) |
+| `results/permitting_jobs.csv` | The 8,827 word-mention postings: year, month, title, agency, department, series, mention_type, USAJOBS link. **Start here.** |
+| `results/expanded_jobs.csv` | The 50,327 expanded-search postings, with flag and matched terms |
+| `results/current_permitting_jobs.csv` | Currently open jobs matching the vocabulary, with matched terms per job |
+| `results/permitting_by_year.csv` | Postings per year |
+| `results/permitting_contexts.csv` | The raw text snippets around every "permitting" — the evidence behind mention_type |
 
-**Or double-click `index.html`** to browse the same data in your web browser —
-searchable and filterable, no Excel needed.
+All CSVs open in Excel/Google Sheets. Links open the announcement on USAJOBS
+(closed jobs still display, marked as closed).
 
-`results/permitting_by_year.csv` is a small count of postings per year.
-`results/expanded_jobs.csv` (after running the expanded scan below) covers
-jobs that do permitting work under other names — NEPA reviews, NPDES,
-section 404, special use permits — with a `flag` column separating "likely
-permitting" from "adjacent mention."
+The web viewer (`index.html`, or the link up top) shows
+`permitting_jobs.csv` with column filters, shareable filter URLs, and CSV
+download. Hover a mention type for the words behind the call; click it to
+read the actual snippets.
 
-## The rules live in patterns.yaml
-
-Everything judgment-based is configuration, not code:
-
-1. **Incidental filtering** — which uses of the word "permitting" don't count:
-   stock phrases ("weather/budget permitting") and verb uses ("permitting you
-   to…"), plus `real_overrides` that force specific phrasings to count (TTB's
-   Permitting Division, APHIS's movement certificates).
-2. **Grab rule** — `expansion.core_phrases` + `expansion.adjacent_phrases`:
-   what the expanded scans collect. Matched case-insensitively with word
-   boundaries (so "rcra" can't match inside "aircraft" — learned the hard way).
-3. **Flag rule** — a grabbed posting is `likely permitting` if it matches ≥1
-   core phrase or ≥`adjacent_threshold` distinct adjacent phrases; otherwise
-   `adjacent mention`. The word "permitting" only counts as core when rule 1
-   didn't classify the posting incidental.
-
-Edit the YAML, then rerun the classifiers (seconds, no re-scan):
+## Rebuilding
 
 ```bash
-python3 classify.py            # re-classify the word-scan results
-python3 classify_expanded.py   # re-flag the expanded-scan results
+bash scan_permitting.sh      # ~1 hr: search corpus for "permitting" + save snippets
+bash join_agencies.sh        # join agency/series from R2, then classify
+bash scan_expanded.sh        # ~1 hr: search corpus for the step-3 vocabulary
+python3 classify_expanded.py # flag expanded results
+bash update_current.sh       # refresh currently-open jobs (caches ~2GB locally
+                             #   on first run; R2 remote reads fail on these files)
+python3 classify.py          # rerun after editing patterns.yaml (no re-search)
 ```
 
-## Finding TODAY'S open permitting jobs
-
-```bash
-bash update_current.sh
-```
-
-Writes `results/current_permitting_jobs.csv` — currently open positions
-matching the grab rule, with a `matched_phrases` column showing why each was
-included. Reads the live-jobs mirror maintained by the
-[usajobs_historical](https://github.com/abigailhaddad/usajobs_historical)
-pipeline, so "current" is as fresh as that pipeline's last run.
-
-## Rebuilding from scratch (coders)
-
-```bash
-bash scan_permitting.sh    # ~1 hr: full-text scan of ~2M announcements
-                           # (HF dataset loyoladatamining/usajobs) remotely
-                           # via DuckDB; nothing downloaded except hits
-bash finalize.sh           # joins agency names from R2, runs classify.py
-bash scan_expanded.sh      # ~1 hr: second pass with the grab-rule phrases
-python3 classify_expanded.py
-```
-
-Intermediate files: `results/permitting_hits.csv` (raw word-scan),
-`results/permitting_contexts.csv` (±120 chars around every mention — read
-this when tuning patterns.yaml), `results/permitting_jobs_base.csv`
-(pre-classification), `results/expanded_hits.csv` (raw expanded scan),
-`reference/parquet_files.txt` (corpus file list).
+Pipeline: `scan_permitting.sh` → `results/permitting_hits.csv` + contexts →
+`join_agencies.sh` → `results/permitting_jobs_base.csv` → `classify.py` →
+final CSVs + viewer data (`data.js`, `contexts.js`).
 
 ## Caveats
 
-- The incidental/real split is pattern-based. It was tuned by reading
-  contexts (see `results/permitting_contexts.csv`) but skim before trusting
-  it for anything load-bearing.
-- Posting volume isn't constant: overall federal hiring collapsed in 2025,
-  so raw counts need a denominator for trend claims.
-- "Adjacent mention" jobs (one NEPA/environmental-review phrase, nothing
-  else) are deliberately not flagged — many are compliance jobs, not
-  permitting jobs. Raise or lower `adjacent_threshold` in patterns.yaml to
-  taste.
+- The incidental/real rules were tuned by reading snippets, not by labeling a
+  gold set. Skim `permitting_contexts.csv` (or click through mention types in
+  the viewer) before leaning on the split for anything load-bearing.
+- Counts are raw. Federal posting volume collapsed in 2025, so trends need a
+  denominator.
+- A job can do permitting work without using any term we search for; the
+  expanded search narrows that gap but doesn't close it.

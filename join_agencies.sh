@@ -1,7 +1,7 @@
 #!/bin/bash
 # After scan_permitting.sh: join agency names + occupational series from the
 # usajobs_historical R2 mirror, write results/permitting_jobs_base.csv, then
-# run classify.py (patterns.yaml) to build the final outputs.
+# then run classify.py to classify and build all outputs.
 cd "$(dirname "$0")"
 duckdb -c "
 LOAD httpfs;

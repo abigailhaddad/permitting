@@ -6,7 +6,7 @@ opens: results/permitting_jobs.csv, data.js (for index.html),
 results/permitting_by_year.csv, reference/permitting_agency_series.csv.
 
 Fast and local: edit patterns.yaml, rerun this, done. No re-scanning.
-Requires results/permitting_jobs_base.csv (from finalize.sh) and
+Requires results/permitting_jobs_base.csv (from join_agencies.sh) and
 results/permitting_contexts.csv (from scan_permitting.sh).
 """
 
