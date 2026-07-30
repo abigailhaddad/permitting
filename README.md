@@ -47,7 +47,7 @@ present. Postings from both go through the same classification rules.
 
 5. **Kept the dataset current.** The corpus ends March 2026, but the
    [usajobs_historical](https://github.com/abigailhaddad/usajobs_historical)
-   pipeline maintains a running archive of every job the live API sees.
+   pipeline maintains a running archive of every job the USAJOBS current jobs API sees.
    `update_current.sh` pulls "permitting" postings opened after the cutoff
    that we don't already have, runs them through the same rules, and adds
    them to the dataset and the website. It also writes a list of jobs

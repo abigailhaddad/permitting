@@ -11,12 +11,13 @@
   body { margin: 2rem auto; max-width: 1300px; padding: 0 1rem; }
   p.note { color: #555; max-width: 75ch; }
   .mention-cell, .series-cell { border-bottom: 1px dotted #888; }
+  .terms-tooltip .tooltip-inner { max-width: 480px; text-align: left; }
 </style>
 </head>
 <body>
 <h1>Federal permitting jobs</h1>
 <p class="note">Federal job postings involving permitting work, 2017 to now
-(scraped USAJOBS announcements, extended to the present from the live API).
+(scraped USAJOBS announcements, extended to the present from the USAJOBS current jobs API).
 Jobs either say &ldquo;permitting&rdquo; &mdash; classified real or incidental
 from the surrounding text &mdash; or match
 <span id="expansionTerms" class="mention-cell">permitting-related terms</span>
@@ -65,6 +66,7 @@ the call; click one to read the mentions. Rules:
   if (typeof EXPANSION !== 'undefined') {
     const termsEl = document.getElementById('expansionTerms');
     termsEl.setAttribute('data-bs-toggle', 'tooltip');
+    termsEl.setAttribute('data-bs-custom-class', 'terms-tooltip');
     termsEl.title = 'Any of these on its own: ' + EXPANSION.core.join(', ') +
       '. Or ' + EXPANSION.threshold + '+ of: ' + EXPANSION.adjacent.join(', ') + '.';
     new bootstrap.Tooltip(termsEl);
