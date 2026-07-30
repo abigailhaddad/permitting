@@ -46,11 +46,34 @@ def classify_contexts(contexts):
 
 
 ctx_by_job = defaultdict(list)
-for row in csv.DictReader(open('results/permitting_contexts.csv')):
-    ctx_by_job[row['usajobsControlNumber']].append(row['ctx'].lower())
+ctx_files = ['results/permitting_contexts.csv', 'results/permitting_contexts_archive.csv']
+for path in ctx_files:
+    try:
+        f = open(path)
+    except FileNotFoundError:
+        continue
+    for row in csv.DictReader(f):
+        ctx_by_job[row['usajobsControlNumber']].append(row['ctx'].lower())
 
+# The HF-corpus scan plus any newer postings pulled from the current-jobs
+# archive (update_current.sh); the archive file already excludes controls
+# present in the corpus base.
+base_files = ['results/permitting_jobs_base.csv', 'results/permitting_jobs_archive_base.csv']
 rows = []
-for row in csv.DictReader(open('results/permitting_jobs_base.csv')):
+seen_controls = set()
+base_rows = []
+for path in base_files:
+    try:
+        f = open(path)
+    except FileNotFoundError:
+        continue
+    for row in csv.DictReader(f):
+        if row['usajobsControlNumber'] in seen_controls:
+            continue
+        seen_controls.add(row['usajobsControlNumber'])
+        base_rows.append(row)
+
+for row in base_rows:
     contexts = ctx_by_job.get(row['usajobsControlNumber'], [])
     if contexts:
         row['mention_type'], row['why'] = classify_contexts(contexts)

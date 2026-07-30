@@ -36,10 +36,13 @@ Browse it: **https://abigailhaddad.github.io/permitting/**
    from the [usajobs_historical](https://github.com/abigailhaddad/usajobs_historical)
    R2 mirror, by control number.
 
-5. **Built the same thing for currently open jobs** — `update_current.sh`
-   applies the step-3 vocabulary to the current-jobs mirror (a running
-   archive of every job the live API has seen this year) and keeps only
-   postings whose close date hasn't passed.
+5. **Kept the dataset current.** The corpus ends March 2026, but the
+   [usajobs_historical](https://github.com/abigailhaddad/usajobs_historical)
+   pipeline maintains a running archive of every job the live API sees.
+   `update_current.sh` pulls "permitting" postings opened after the cutoff
+   that we don't already have, runs them through the same rules, and adds
+   them to the dataset and the website. It also writes a list of jobs
+   matching the step-3 vocabulary that are still open right now.
 
 Every list and threshold from steps 2–3 lives in **`patterns.yaml`**. Edit it
 and rerun the classifiers (seconds, no re-searching) to change what counts.
@@ -48,7 +51,7 @@ and rerun the classifiers (seconds, no re-searching) to change what counts.
 
 | File | What it is |
 |---|---|
-| `results/permitting_jobs.csv` | The 8,827 word-mention postings: year, month, title, agency, department, series, mention_type, USAJOBS link. **Start here.** |
+| `results/permitting_jobs.csv` | All word-mention postings (8,957 and counting): year, month, title, agency, department, series, mention_type, USAJOBS link. **Start here.** |
 | `results/expanded_jobs.csv` | The 50,327 expanded-search postings, with flag and matched terms |
 | `results/current_permitting_jobs.csv` | Currently open jobs matching the vocabulary, with matched terms per job |
 | `results/permitting_by_year.csv` | Postings per year |
@@ -69,8 +72,9 @@ bash scan_permitting.sh      # ~1 hr: search corpus for "permitting" + save snip
 bash join_agencies.sh        # join agency/series from R2, then classify
 bash scan_expanded.sh        # ~1 hr: search corpus for the step-3 vocabulary
 python3 classify_expanded.py # flag expanded results
-bash update_current.sh       # refresh currently-open jobs (caches ~2GB locally
-                             #   on first run; R2 remote reads fail on these files)
+bash update_current.sh       # pull post-cutoff postings from the live archive
+                             #   into the dataset + refresh the open-jobs list
+                             #   (caches ~2GB locally on first run)
 python3 classify.py          # rerun after editing patterns.yaml (no re-search)
 ```
 
