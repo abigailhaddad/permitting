@@ -8,7 +8,7 @@ The data combines two sources: the
 [`loyoladatamining/usajobs`](https://huggingface.co/datasets/loyoladatamining/usajobs)
 scraped corpus (~2M announcements, 2017–March 2026) and the
 [usajobs_historical](https://github.com/abigailhaddad/usajobs_historical)
-live-API archive, which extends coverage from the corpus cutoff to the
+USAJOBS current jobs API archive, which extends coverage from the corpus cutoff to the
 present. Postings from both go through the same classification rules.
 
 ## What we did
