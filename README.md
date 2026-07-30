@@ -37,7 +37,9 @@ Browse it: **https://abigailhaddad.github.io/permitting/**
    R2 mirror, by control number.
 
 5. **Built the same thing for currently open jobs** — `update_current.sh`
-   applies the step-3 vocabulary to the live current-jobs mirror.
+   applies the step-3 vocabulary to the current-jobs mirror (a running
+   archive of every job the live API has seen this year) and keeps only
+   postings whose close date hasn't passed.
 
 Every list and threshold from steps 2–3 lives in **`patterns.yaml`**. Edit it
 and rerun the classifiers (seconds, no re-searching) to change what counts.

@@ -1,5 +1,8 @@
 #!/bin/bash
 # Find CURRENTLY OPEN permitting jobs. Run any time; no coding needed.
+# The current_jobs mirror is a running archive of every job the current API
+# has seen this year, so we keep only rows whose close date is today or later
+# (or missing).
 #
 # Reads the live current_jobs_*.parquet mirror on R2 (refreshed by the
 # usajobs_historical pipeline) and matches each open job's raw record against
@@ -33,6 +36,7 @@ COPY (
          'https://www.usajobs.gov/job/' || usajobsControlNumber AS link
   FROM read_parquet($(python3 -c "import os; print('[' + ', '.join(chr(39) + 'cache/' + os.path.basename(u.strip()) + chr(39) for u in open('reference/r2_current_urls.txt')) + ']')"), union_by_name=true)
   WHERE regexp_matches(lower(CAST(MatchedObjectDescriptor AS VARCHAR)), '$RX')
+    AND (positionCloseDate IS NULL OR positionCloseDate = '' OR substr(positionCloseDate, 1, 10) >= strftime(current_date, '%Y-%m-%d'))
   ORDER BY agency, title
 ) TO 'results/current_permitting_jobs.csv' (HEADER);
 "; then
