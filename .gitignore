@@ -1,3 +1,4 @@
 tmp_*.csv
 err*.txt
 .playwright-mcp/
+cache/
