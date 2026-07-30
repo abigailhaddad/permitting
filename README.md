@@ -17,7 +17,7 @@ One row per historical posting:
 | agency, department | Who was hiring |
 | series | Occupational series code (e.g. 0401 = biologist) |
 | mention_type | `real mention` = permitting looks like part of the job. `probably incidental` = every mention was a stock phrase ("weather permitting") or verb use ("a waiver permitting you to…") |
-| link | Opens the announcement on USAJOBS (older ones have expired) |
+| link | Opens the announcement on USAJOBS (closed jobs still display, marked as closed) |
 
 **Or double-click `index.html`** to browse the same data in your web browser —
 searchable and filterable, no Excel needed.
