@@ -50,9 +50,17 @@ with open('results/permitting_jobs.csv', 'w', newline='') as f:
     w.writeheader()
     w.writerows(rows)
 
+full = yaml.safe_load(open('patterns.yaml'))
+patterns = {
+    'stock_phrases': full['incidental']['stock_phrases'],
+    'verb_following_words': full['incidental']['verb_following_words'],
+    'real_overrides': full['real_overrides'],
+}
 with open('data.js', 'w') as f:
     f.write('const JOBS = ')
     json.dump(rows, f)
+    f.write(';\nconst PATTERNS = ')
+    json.dump(patterns, f)
     f.write(';')
 
 by_year = Counter(r['year'] for r in rows)

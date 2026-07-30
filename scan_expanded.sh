@@ -5,17 +5,7 @@
 # posting was included.
 # Output: results/expanded_hits.csv
 cd "$(dirname "$0")"
-RX=$(python3 -c "
-import yaml, re
-p = yaml.safe_load(open('patterns.yaml'))['expansion']
-phrases = p['core_phrases'] + p['adjacent_phrases']
-def b(x):
-    x = re.escape(x.lower())
-    wb = chr(92) + 'b'
-    return (wb if x[0].isalnum() else '') + x + (wb if x[-1].isalnum() else '')
-rx = '|'.join(b(x) for x in phrases)
-print(rx.replace(chr(39), chr(39)*2))
-")
+RX=$(python3 build_rx.py)
 OUT=results/expanded_hits.csv
 echo "month,usajobsControlNumber,title,matched_phrases" > "$OUT"
 FAILED=()

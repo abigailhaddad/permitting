@@ -1,0 +1,14 @@
+https://pub-317c58882ec04f329b63842c1eb65b0c.r2.dev/data/historical_jobs_2013.parquet
+https://pub-317c58882ec04f329b63842c1eb65b0c.r2.dev/data/historical_jobs_2014.parquet
+https://pub-317c58882ec04f329b63842c1eb65b0c.r2.dev/data/historical_jobs_2015.parquet
+https://pub-317c58882ec04f329b63842c1eb65b0c.r2.dev/data/historical_jobs_2016.parquet
+https://pub-317c58882ec04f329b63842c1eb65b0c.r2.dev/data/historical_jobs_2017.parquet
+https://pub-317c58882ec04f329b63842c1eb65b0c.r2.dev/data/historical_jobs_2018.parquet
+https://pub-317c58882ec04f329b63842c1eb65b0c.r2.dev/data/historical_jobs_2019.parquet
+https://pub-317c58882ec04f329b63842c1eb65b0c.r2.dev/data/historical_jobs_2020.parquet
+https://pub-317c58882ec04f329b63842c1eb65b0c.r2.dev/data/historical_jobs_2021.parquet
+https://pub-317c58882ec04f329b63842c1eb65b0c.r2.dev/data/historical_jobs_2022.parquet
+https://pub-317c58882ec04f329b63842c1eb65b0c.r2.dev/data/historical_jobs_2023.parquet
+https://pub-317c58882ec04f329b63842c1eb65b0c.r2.dev/data/historical_jobs_2024.parquet
+https://pub-317c58882ec04f329b63842c1eb65b0c.r2.dev/data/historical_jobs_2025.parquet
+https://pub-317c58882ec04f329b63842c1eb65b0c.r2.dev/data/historical_jobs_2026.parquet

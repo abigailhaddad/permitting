@@ -1,0 +1,2 @@
+https://pub-317c58882ec04f329b63842c1eb65b0c.r2.dev/data/current_jobs_2025.parquet
+https://pub-317c58882ec04f329b63842c1eb65b0c.r2.dev/data/current_jobs_2026.parquet

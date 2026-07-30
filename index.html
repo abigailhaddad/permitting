@@ -36,6 +36,7 @@ may have expired).</p>
   <label>Year:
     <select id="year"><option value="">All</option></select>
   </label>
+  <button id="download" type="button">Download filtered rows as CSV</button>
 </div>
 <table id="jobs" class="display" style="width:100%">
   <thead>
@@ -46,6 +47,16 @@ may have expired).</p>
 <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
 <script src="data.js"></script>
 <script>
+  function mentionTypeTooltip(mentionType) {
+    if (mentionType === 'probably incidental') {
+      return 'Every mention matched a stock phrase (' +
+        PATTERNS.stock_phrases.join(', ') + ' + permitting) or a verb use (permitting ' +
+        PATTERNS.verb_following_words.slice(0, 8).join('/') + '/…)';
+    }
+    return 'At least one mention looks like permitting work. Phrases that always count: ' +
+      PATTERNS.real_overrides.join('; ');
+  }
+
   var table = $('#jobs').DataTable({
     data: JOBS,
     pageLength: 50,
@@ -56,7 +67,9 @@ may have expired).</p>
       { data: 'title' },
       { data: 'agency' },
       { data: 'department' },
-      { data: 'mention_type' },
+      { data: 'mention_type', render: function(d) {
+          return '<span title="' + mentionTypeTooltip(d) + '">' + d + '</span>';
+        } },
       { data: 'link', render: function(d) { return '<a href="' + d + '" target="_blank">open</a>'; } }
     ]
   });
@@ -66,6 +79,24 @@ may have expired).</p>
   years.forEach(function(y) { $('#year').append('<option value="' + y + '">' + y + '</option>'); });
   $('#mtype').on('change', function() { table.column(5).search(this.value).draw(); });
   $('#year').on('change', function() { table.column(0).search(this.value).draw(); });
+
+  function csvField(value) {
+    return '"' + String(value == null ? '' : value).replace(/"/g, '""') + '"';
+  }
+
+  $('#download').on('click', function() {
+    const header = ['year', 'month', 'title', 'agency', 'department', 'mention_type', 'link'];
+    const lines = [header.join(',')];
+    table.rows({ search: 'applied' }).data().each(function(row) {
+      lines.push(header.map(function(col) { return csvField(row[col]); }).join(','));
+    });
+    const blob = new Blob([lines.join('\n')], { type: 'text/csv' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'permitting_jobs_filtered.csv';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
 </script>
 </body>
 </html>

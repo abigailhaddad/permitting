@@ -7,17 +7,7 @@
 # counts; the matched_phrases column shows why each job was included.
 # Output: results/current_permitting_jobs.csv (open in Excel/Google Sheets)
 cd "$(dirname "$0")"
-RX=$(python3 -c "
-import yaml, re
-p = yaml.safe_load(open('patterns.yaml'))['expansion']
-phrases = p['core_phrases'] + p['adjacent_phrases']
-def b(x):
-    x = re.escape(x.lower())
-    wb = chr(92) + 'b'
-    return (wb if x[0].isalnum() else '') + x + (wb if x[-1].isalnum() else '')
-rx = '|'.join(b(x) for x in phrases)
-print(rx.replace(chr(39), chr(39)*2))
-")
+RX=$(python3 build_rx.py)
 duckdb -c "
 LOAD httpfs;
 COPY (
@@ -29,7 +19,7 @@ COPY (
          positionCloseDate AS closes,
          list_distinct(regexp_extract_all(lower(CAST(MatchedObjectDescriptor AS VARCHAR)), '$RX')) AS matched_phrases,
          'https://www.usajobs.gov/job/' || usajobsControlNumber AS link
-  FROM read_parquet(['https://pub-317c58882ec04f329b63842c1eb65b0c.r2.dev/data/current_jobs_2025.parquet','https://pub-317c58882ec04f329b63842c1eb65b0c.r2.dev/data/current_jobs_2026.parquet'], union_by_name=true)
+  FROM read_parquet($(python3 -c "print('[' + ', '.join(chr(39) + u.strip() + chr(39) for u in open('reference/r2_current_urls.txt')) + ']')"), union_by_name=true)
   WHERE regexp_matches(lower(CAST(MatchedObjectDescriptor AS VARCHAR)), '$RX')
   ORDER BY agency, title
 ) TO 'results/current_permitting_jobs.csv' (HEADER);
