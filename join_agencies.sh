@@ -11,6 +11,18 @@ SELECT usajobsControlNumber::varchar AS control, hiringAgencyName, hiringDepartm
        array_to_string(regexp_extract_all(coalesce(JobCategories, jobcategories_1, ''), '[0-9]{4}'), ' | ') AS series
 FROM read_parquet($(python3 -c "print('[' + ', '.join(chr(39) + u.strip() + chr(39) for u in open('reference/r2_historical_urls.txt')) + ']')"),
   union_by_name=true);
+CREATE TABLE exp AS SELECT * FROM read_csv('results/expanded_hits.csv', header=true, all_varchar=true);
+COPY (
+  SELECT substr(e.month,1,4) AS year, e.month, e.title,
+         coalesce(a.hiringAgencyName, '') AS agency,
+         coalesce(a.hiringDepartmentName, '') AS department,
+         coalesce(a.series, '') AS series,
+         e.matched_phrases,
+         'https://www.usajobs.gov/job/' || e.usajobsControlNumber AS link,
+         e.usajobsControlNumber
+  FROM exp e LEFT JOIN ag a ON e.usajobsControlNumber = a.control
+  ORDER BY e.month, e.title
+) TO 'results/expanded_base.csv' (HEADER);
 COPY (
   SELECT substr(h.month,1,4) AS year,
          h.month,

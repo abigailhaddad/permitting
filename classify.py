@@ -1,13 +1,24 @@
 #!/usr/bin/env python3
 """
-Classify each permitting posting as 'real mention' or 'probably incidental'
-using the rules in patterns.yaml, then rebuild the outputs a person actually
-opens: results/permitting_jobs.csv, data.js (for index.html),
-results/permitting_by_year.csv, reference/permitting_agency_series.csv.
+Build the unified dataset from the rules in patterns.yaml.
 
-Fast and local: edit patterns.yaml, rerun this, done. No re-scanning.
-Requires results/permitting_jobs_base.csv (from join_agencies.sh) and
-results/permitting_contexts.csv (from scan_permitting.sh).
+Sources (all already have agency/series joined by join_agencies.sh, plus any
+archive rows from update_current.sh):
+  results/permitting_jobs_base.csv          word-scan postings (HF corpus)
+  results/permitting_jobs_archive_base.csv  word postings after the corpus cutoff
+  results/expanded_base.csv                 postings matching the expansion vocabulary
+
+Every posting gets one mention_type:
+  real mention          says "permitting", and not merely incidentally
+  probably incidental   says "permitting", but every mention is a stock phrase
+                        or verb use
+  likely permitting     doesn't say the word; matches >=1 core term or
+                        >= adjacent_threshold distinct adjacent terms
+  adjacent mention      doesn't say the word; one adjacent term only
+
+Outputs: results/permitting_jobs.csv (word postings), results/expanded_jobs.csv
+(vocabulary postings), results/permitting_by_year.csv, and the website data
+(data.js with all rows + series names, contexts.js for the mentions modal).
 """
 
 import csv
@@ -24,10 +35,13 @@ stock = re.compile(
 verb = re.compile(
     r'permitting\s+(?:' + '|'.join(re.escape(w) for w in P['incidental']['verb_following_words']) + r')\b')
 overrides = [o.lower() for o in P['real_overrides']]
+core = set(p.lower() for p in P['expansion']['core_phrases']) - {'permitting'}
+adjacent = set(p.lower() for p in P['expansion']['adjacent_phrases'])
+threshold = int(P['expansion']['adjacent_threshold'])
 
 
-def classify_contexts(contexts):
-    """Return (mention_type, why) -- why lists the specific matched words."""
+def classify_word_contexts(contexts):
+    """(mention_type, why) for a posting that contains the word."""
     hit_overrides = sorted(set(o for c in contexts for o in overrides if o in c))
     if hit_overrides:
         return 'real mention', 'matched: ' + '; '.join(hit_overrides)
@@ -45,60 +59,82 @@ def classify_contexts(contexts):
         '; incidental matches too: ' + '; '.join(sorted(incidental_hits)) if incidental_hits else '')
 
 
-ctx_by_job = defaultdict(list)
-ctx_files = ['results/permitting_contexts.csv', 'results/permitting_contexts_archive.csv']
-for path in ctx_files:
+TERM_RE = re.compile(r"[a-z0-9][a-z0-9 .&'/-]*[a-z0-9]")
+
+
+def classify_expanded_terms(matched_cell):
+    """(mention_type, why) for a posting found only via the expansion vocabulary."""
+    found = set(m.group(0) for m in TERM_RE.finditer(matched_cell.lower()))
+    c = sorted(found & core)
+    a = sorted(found & adjacent)
+    if c or len(a) >= threshold:
+        return 'likely permitting', 'matched: ' + '; '.join(c + a)
+    return 'adjacent mention', ('matched: ' + '; '.join(a)) if a else 'no term parsed'
+
+
+def read_csv_rows(path):
     try:
         f = open(path)
     except FileNotFoundError:
-        continue
-    for row in csv.DictReader(f):
+        return []
+    return list(csv.DictReader(f))
+
+
+ctx_by_job = defaultdict(list)
+for path in ['results/permitting_contexts.csv', 'results/permitting_contexts_archive.csv']:
+    for row in read_csv_rows(path):
         ctx_by_job[row['usajobsControlNumber']].append(row['ctx'].lower())
 
-# The HF-corpus scan plus any newer postings pulled from the current-jobs
-# archive (update_current.sh); the archive file already excludes controls
-# present in the corpus base.
-base_files = ['results/permitting_jobs_base.csv', 'results/permitting_jobs_archive_base.csv']
-rows = []
-seen_controls = set()
-base_rows = []
-for path in base_files:
-    try:
-        f = open(path)
-    except FileNotFoundError:
-        continue
-    for row in csv.DictReader(f):
-        if row['usajobsControlNumber'] in seen_controls:
+# Word postings (corpus + archive), then vocabulary-only postings
+rows, seen = [], set()
+for path in ['results/permitting_jobs_base.csv', 'results/permitting_jobs_archive_base.csv']:
+    for row in read_csv_rows(path):
+        if row['usajobsControlNumber'] in seen:
             continue
-        seen_controls.add(row['usajobsControlNumber'])
-        base_rows.append(row)
+        seen.add(row['usajobsControlNumber'])
+        contexts = ctx_by_job.get(row['usajobsControlNumber'], [])
+        if contexts:
+            row['mention_type'], row['why'] = classify_word_contexts(contexts)
+        else:
+            row['mention_type'], row['why'] = 'real mention', 'no context captured'
+        rows.append(row)
+n_word = len(rows)
 
-for row in base_rows:
-    contexts = ctx_by_job.get(row['usajobsControlNumber'], [])
-    if contexts:
-        row['mention_type'], row['why'] = classify_contexts(contexts)
-    else:
-        row['mention_type'], row['why'] = 'real mention', 'no context captured'
+for row in read_csv_rows('results/expanded_base.csv'):
+    if row['usajobsControlNumber'] in seen:
+        continue
+    seen.add(row['usajobsControlNumber'])
+    row['mention_type'], row['why'] = classify_expanded_terms(row.get('matched_phrases', ''))
     rows.append(row)
 
 cols = ['year', 'month', 'title', 'agency', 'department', 'series', 'mention_type', 'link', 'usajobsControlNumber']
+word_types = {'real mention', 'probably incidental'}
 with open('results/permitting_jobs.csv', 'w', newline='') as f:
     w = csv.DictWriter(f, fieldnames=cols, extrasaction='ignore')
     w.writeheader()
-    w.writerows(rows)
+    w.writerows(r for r in rows if r['mention_type'] in word_types)
+with open('results/expanded_jobs.csv', 'w', newline='') as f:
+    w = csv.DictWriter(f, fieldnames=cols + ['why'], extrasaction='ignore')
+    w.writeheader()
+    w.writerows(r for r in rows if r['mention_type'] not in word_types)
 
-expansion = yaml.safe_load(open('patterns.yaml'))['expansion']
+expansion = P['expansion']
+series_names = json.load(open('reference/series_names.json'))
+# Website: the three meaningful tiers (adjacent mentions stay CSV-only), and
+# year/link are derived client-side from month/control to keep the file small.
+site_rows = [{k: r[k] for k in ('month', 'title', 'agency', 'department', 'series', 'mention_type', 'why', 'usajobsControlNumber')}
+             for r in rows if r['mention_type'] != 'adjacent mention']
 with open('data.js', 'w') as f:
     f.write('const JOBS = ')
-    json.dump(rows, f)
+    json.dump(site_rows, f)
     f.write(';\nvar EXPANSION = ')
     json.dump({'core': expansion['core_phrases'],
                'adjacent': expansion['adjacent_phrases'],
                'threshold': expansion['adjacent_threshold']}, f)
+    f.write(';\nvar SERIES_NAMES = ')
+    json.dump(series_names, f)
     f.write(';')
 
-# contexts.js: control number -> list of text snippets, lazy-loaded by the
-# viewer's "view mentions" modal
 with open('contexts.js', 'w') as f:
     f.write('var CONTEXTS = ')
     json.dump({k: v for k, v in ctx_by_job.items()}, f)
@@ -107,19 +143,12 @@ with open('contexts.js', 'w') as f:
 by_year = Counter(r['year'] for r in rows)
 with open('results/permitting_by_year.csv', 'w', newline='') as f:
     w = csv.writer(f)
-    w.writerow(['year', 'postings', 'real_mentions'])
+    w.writerow(['year', 'postings', 'real_mentions', 'likely_permitting'])
     real = Counter(r['year'] for r in rows if r['mention_type'] == 'real mention')
+    likely = Counter(r['year'] for r in rows if r['mention_type'] == 'likely permitting')
     for y in sorted(by_year):
-        w.writerow([y, by_year[y], real.get(y, 0)])
+        w.writerow([y, by_year[y], real.get(y, 0), likely.get(y, 0)])
 
-combos = Counter((r['agency'], r['department'], r.get('series', ''))
-                 for r in rows if r['mention_type'] == 'real mention' and r['agency'])
-with open('reference/permitting_agency_series.csv', 'w', newline='') as f:
-    w = csv.writer(f)
-    w.writerow(['agency', 'department', 'series', 'historical_postings'])
-    for (a, d, s), n in combos.most_common():
-        if n >= 3:
-            w.writerow([a, d, s, n])
-
-n_real = sum(1 for r in rows if r['mention_type'] == 'real mention')
-print(f"{len(rows)} postings: {n_real} real, {len(rows) - n_real} probably incidental")
+counts = Counter(r['mention_type'] for r in rows)
+print(f"{len(rows)} postings ({n_word} word, {len(rows) - n_word} vocabulary-only): "
+      + ', '.join(f"{k}: {v}" for k, v in counts.most_common()))

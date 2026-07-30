@@ -34,10 +34,12 @@ present. Postings from both go through the same classification rules.
 3. **Ran a second search for permitting work that skips the word.** From the
    real postings' snippets we collected the vocabulary that co-occurs with
    permitting (NEPA, NPDES, section 404, special use permits, …) and searched
-   the corpus again — 50,327 postings. Each is flagged `likely permitting`
-   (matched a precise term like "permit applications" or NPDES, or 2+ broader
-   ones like NEPA + Clean Water Act) or `adjacent mention` (one broad term
-   only — often environmental-review compliance rather than permitting).
+   the corpus again. Postings that don't say "permitting" are flagged
+   `likely permitting` (a precise term like "permit applications" or NPDES,
+   or 2+ broader ones like NEPA + Clean Water Act) or `adjacent mention` (one
+   broad term only — often environmental-review compliance rather than
+   permitting work). Everything except adjacent mentions is on the website;
+   the CSVs have it all.
 
 4. **Joined agency, department, and occupational series** for every posting
    from the [usajobs_historical](https://github.com/abigailhaddad/usajobs_historical)
@@ -58,8 +60,8 @@ and rerun the classifiers (seconds, no re-searching) to change what counts.
 
 | File | What it is |
 |---|---|
-| `results/permitting_jobs.csv` | All word-mention postings (8,957 and counting): year, month, title, agency, department, series, mention_type, USAJOBS link. **Start here.** |
-| `results/expanded_jobs.csv` | The 50,327 expanded-search postings, with flag and matched terms |
+| `results/permitting_jobs.csv` | Postings that say "permitting" (~9k): year, month, title, agency, department, series, mention_type, USAJOBS link. **Start here.** |
+| `results/expanded_jobs.csv` | Postings matching the wider vocabulary without the word (~41k), same columns plus why |
 | `results/current_permitting_jobs.csv` | Currently open jobs matching the vocabulary, with matched terms per job |
 | `results/permitting_by_year.csv` | Postings per year |
 | `results/permitting_contexts.csv` | The raw text snippets around every "permitting" — the evidence behind mention_type |
@@ -78,7 +80,6 @@ read the actual snippets.
 bash scan_permitting.sh      # ~1 hr: search corpus for "permitting" + save snippets
 bash join_agencies.sh        # join agency/series from R2, then classify
 bash scan_expanded.sh        # ~1 hr: search corpus for the step-3 vocabulary
-python3 classify_expanded.py # flag expanded results
 bash update_current.sh       # pull post-cutoff postings from the live archive
                              #   into the dataset + refresh the open-jobs list
                              #   (caches ~2GB locally on first run)
