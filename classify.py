@@ -64,9 +64,14 @@ with open('results/permitting_jobs.csv', 'w', newline='') as f:
     w.writeheader()
     w.writerows(rows)
 
+expansion = yaml.safe_load(open('patterns.yaml'))['expansion']
 with open('data.js', 'w') as f:
     f.write('const JOBS = ')
     json.dump(rows, f)
+    f.write(';\nvar EXPANSION = ')
+    json.dump({'core': expansion['core_phrases'],
+               'adjacent': expansion['adjacent_phrases'],
+               'threshold': expansion['adjacent_threshold']}, f)
     f.write(';')
 
 # contexts.js: control number -> list of text snippets, lazy-loaded by the

@@ -15,10 +15,15 @@
 </head>
 <body>
 <h1>Federal jobs that mention &ldquo;permitting&rdquo;</h1>
-<p class="note">Every USAJOBS announcement from 2017 through March 2026 whose
-full text contains the word &ldquo;permitting.&rdquo; Hover a mention type to
-see which specific words drove the call; click it to read
-the actual text around each mention. Rules live in
+<p class="note">This table: every USAJOBS announcement from 2017 through
+March 2026 whose full text contains the word &ldquo;permitting.&rdquo; A
+companion dataset in the repo
+(<a href="https://github.com/abigailhaddad/permitting/blob/main/results/expanded_jobs.csv">expanded_jobs.csv</a>,
+~50k announcements) also covers
+<span id="expansionTerms" class="mention-cell">other permitting-related terms</span>
+that jobs use when they skip the word. Hover a mention type to see which
+specific words drove the call; click it to read the actual text around each
+mention. All rules live in
 <a href="https://github.com/abigailhaddad/permitting/blob/main/patterns.yaml">patterns.yaml</a>.
 Older announcement links have expired.</p>
 <div id="toolbarButtons" class="mb-2"></div>
@@ -60,6 +65,10 @@ Older announcement links have expired.</p>
     });
     document.querySelector('#jobs tbody').innerHTML = rows.join('');
   }
+
+  document.getElementById('expansionTerms').title =
+    'Any of these flags a job on its own: ' + EXPANSION.core.join(', ') +
+    '. These need ' + EXPANSION.threshold + '+ distinct matches: ' + EXPANSION.adjacent.join(', ') + '.';
 
   populateTable();
   const result = initDataTableWithFilters({
