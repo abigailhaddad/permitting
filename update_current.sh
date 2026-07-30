@@ -9,8 +9,12 @@
 cd "$(dirname "$0")"
 RX=$(python3 -c "
 import yaml, re
-p = yaml.safe_load(open('patterns.yaml'))
-rx = '|'.join(re.escape(x.lower()) for x in p['expansion_phrases'])
+p = yaml.safe_load(open('patterns.yaml'))['expansion']
+phrases = p['core_phrases'] + p['adjacent_phrases']
+def b(x):
+    x = re.escape(x.lower())
+    return ('\\b' if x[0].isalnum() else '') + x + ('\\b' if x[-1].isalnum() else '')
+rx = '|'.join(b(x) for x in phrases)
 print(rx.replace(chr(39), chr(39)*2))
 ")
 duckdb -c "

@@ -80,53 +80,59 @@ real_overrides:
   - permitting and taxation          # TTB's Permitting Division (alcohol/tobacco permits)
   - certificates permitting the movement   # APHIS: issuing movement certificates IS permit work
 
-# Phrases for finding permitting-work jobs whose text never says "permitting".
-# Used by scan_expanded.sh (historical corpus) and update_current.sh (open jobs).
-# CANDIDATES -- review before trusting; several (NEPA, environmental review)
-# will also pull in environmental-review jobs that are only permitting-adjacent.
-expansion_phrases:
-  - permitting            # keeps the original word so one list drives everything
-  # environmental review framework
-  - environmental review
-  - national environmental policy act
-  - " nepa "
-  - environmental impact statement
-  - environmental assessment
-  - categorical exclusion
-  - finding of no significant impact
-  - record of decision
-  - environmental compliance
-  # statutes and programs (mined from real permitting postings' contexts)
-  - clean water act
-  - clean air act
-  - safe drinking water act
-  - rivers and harbors act
-  - rcra
-  - cercla
-  - npdes
-  - national pollutant discharge elimination system
-  - coastal zone management act
-  - marine mammal protection act
-  - section 404
-  - section 401
-  - section 408
-  - section 106           # National Historic Preservation Act
-  - section 7 consultation # Endangered Species Act
-  - water quality certification
-  - fast-41
-  # permit work by other names
-  - special use permit
-  - permit applications
-  - permit issuance
-  - permit review
-  - permit processing
-  - permits and licenses
-  - licenses and permits
-  - permit to drill
-  - leasing and permitting
-  - right-of-way
-  - rights-of-way
-  - dredge and fill
-  - incidental take
-  - habitat conservation plan
-  - biological opinion
+# --- What we GRAB and what we FLAG -------------------------------------------
+# Rule 1 (grab): scan_expanded.sh and update_current.sh collect any posting
+#   matching ANY phrase below. Matching is case-insensitive with word
+#   boundaries (so "rcra" no longer matches inside "aircraft").
+# Rule 2 (flag): a posting is "likely permitting" if it matches
+#   >= 1 core phrase, OR >= adjacent_threshold distinct adjacent phrases.
+#   Otherwise it is "adjacent mention" (grabbed, but not flagged).
+#   The word "permitting" itself only counts as core when the posting isn't
+#   classified "probably incidental" by the rules at the top of this file.
+
+expansion:
+  core_phrases:
+    - permitting
+    - permit applications
+    - permit issuance
+    - permit review
+    - permit processing
+    - permits and licenses
+    - licenses and permits
+    - permit to drill
+    - leasing and permitting
+    - special use permit
+    - npdes
+    - national pollutant discharge elimination system
+    - section 404
+    - section 401
+    - section 408
+    - dredge and fill
+    - incidental take
+    - habitat conservation plan
+    - biological opinion
+    - water quality certification
+    - fast-41
+    - rivers and harbors act
+  adjacent_phrases:
+    - environmental review
+    - national environmental policy act
+    - nepa
+    - environmental impact statement
+    - environmental assessment
+    - categorical exclusion
+    - finding of no significant impact
+    - record of decision
+    - environmental compliance
+    - clean water act
+    - clean air act
+    - safe drinking water act
+    - rcra
+    - cercla
+    - coastal zone management act
+    - marine mammal protection act
+    - section 106
+    - section 7 consultation
+    - right-of-way
+    - rights-of-way
+  adjacent_threshold: 2
