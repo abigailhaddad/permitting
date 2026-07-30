@@ -17,12 +17,15 @@
 <body>
 <h1>Federal permitting jobs</h1>
 <p class="note">Federal job postings involving permitting work, 2017 to now
-(scraped USAJOBS announcements, extended to the present from the USAJOBS current jobs API).
-Jobs either say &ldquo;permitting&rdquo; &mdash; classified real or incidental
-from the surrounding text &mdash; or match
-<span id="expansionTerms" class="mention-cell">permitting-related terms</span>
-(&ldquo;likely permitting&rdquo;). Hover a mention type for the words behind
-the call; click one to read the mentions. Rules:
+(scraped USAJOBS announcements, extended to the present from the USAJOBS
+current jobs API). Each posting is one of:</p>
+<ul class="note">
+  <li><span id="tipReal" class="mention-cell">real mention</span> &mdash; says &ldquo;permitting&rdquo; as part of the work</li>
+  <li><span id="tipIncidental" class="mention-cell">probably incidental</span> &mdash; says it only in stock phrases or asides</li>
+  <li><span id="tipLikely" class="mention-cell">likely permitting</span> &mdash; skips the word but matches permitting-related terms</li>
+</ul>
+<p class="note">Hover a mention type in the table for the words behind that
+posting's call; click one to read the mentions. All rules:
 <a href="https://github.com/abigailhaddad/permitting/blob/main/patterns.yaml">patterns.yaml</a>.</p>
 <div id="toolbarButtons" class="mb-2"></div>
 <div class="filters-bar-container">
@@ -63,13 +66,23 @@ the call; click one to read the mentions. Rules:
       .join('; ');
   }
 
-  if (typeof EXPANSION !== 'undefined') {
-    const termsEl = document.getElementById('expansionTerms');
-    termsEl.setAttribute('data-bs-toggle', 'tooltip');
-    termsEl.setAttribute('data-bs-custom-class', 'terms-tooltip');
-    termsEl.title = 'Any of these on its own: ' + EXPANSION.core.join(', ') +
-      '. Or ' + EXPANSION.threshold + '+ of: ' + EXPANSION.adjacent.join(', ') + '.';
-    new bootstrap.Tooltip(termsEl);
+  function attachTip(id, text) {
+    const el = document.getElementById(id);
+    el.setAttribute('data-bs-toggle', 'tooltip');
+    el.setAttribute('data-bs-custom-class', 'terms-tooltip');
+    el.title = text;
+    new bootstrap.Tooltip(el);
+  }
+  if (typeof RULES !== 'undefined') {
+    attachTip('tipReal',
+      'Contains "permitting" in a way that matches no incidental pattern, or uses a phrase that always counts: ' +
+      RULES.overrides.join('; ') + '.');
+    attachTip('tipIncidental',
+      'Every mention is "<word> permitting" (' + RULES.stock.join(', ') +
+      ') or a verb use like "permitting ' + RULES.verb.slice(0, 8).join('/') + '/…".');
+    attachTip('tipLikely',
+      'Does not say "permitting" but matches any of these on its own: ' + RULES.core.join(', ') +
+      '. Or ' + RULES.threshold + '+ of: ' + RULES.adjacent.join(', ') + '.');
   }
 
   const WORD_TYPES = { 'real mention': true, 'probably incidental': true };
@@ -162,8 +175,18 @@ the call; click one to read the mentions. Rules:
     monthChart.update('none');
   }
 
-  table.on('draw.dt', updateChart);
+  // Native title tooltips need a long motionless hover; use Bootstrap's
+  // instant ones on the visible page of rows, refreshed on each draw.
+  let cellTips = [];
+  function refreshCellTooltips() {
+    cellTips.forEach(function(t) { t.dispose(); });
+    cellTips = Array.from(document.querySelectorAll('#jobs tbody .mention-cell[title], #jobs tbody .series-cell[title]'))
+      .map(function(el) { return new bootstrap.Tooltip(el, { customClass: 'terms-tooltip', container: 'body' }); });
+  }
+
+  table.on('draw.dt', function() { updateChart(); refreshCellTooltips(); });
   updateChart();
+  refreshCellTooltips();
 
   // Mentions modal: contexts.js is ~3MB, so load it only on first use.
   let contextsLoading = null;

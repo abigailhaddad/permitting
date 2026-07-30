@@ -127,10 +127,13 @@ site_rows = [{k: r[k] for k in ('month', 'title', 'agency', 'department', 'serie
 with open('data.js', 'w') as f:
     f.write('const JOBS = ')
     json.dump(site_rows, f)
-    f.write(';\nvar EXPANSION = ')
+    f.write(';\nvar RULES = ')
     json.dump({'core': expansion['core_phrases'],
                'adjacent': expansion['adjacent_phrases'],
-               'threshold': expansion['adjacent_threshold']}, f)
+               'threshold': expansion['adjacent_threshold'],
+               'stock': P['incidental']['stock_phrases'],
+               'verb': P['incidental']['verb_following_words'],
+               'overrides': P['real_overrides']}, f)
     f.write(';\nvar SERIES_NAMES = ')
     json.dump(series_names, f)
     f.write(';')
