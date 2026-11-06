@@ -12,6 +12,9 @@
   p.note { color: #555; max-width: 75ch; }
   .mention-cell, .series-cell { border-bottom: 1px dotted #888; }
   .terms-tooltip .tooltip-inner { max-width: 480px; text-align: left; }
+  /* 8 columns do not fit a phone: scroll the table in its own box, not the page */
+  @media (max-width: 768px) { #jobs { display: block; overflow-x: auto; } }
+  .dataTables_wrapper .pagination { flex-wrap: wrap; justify-content: center; }
 </style>
 </head>
 <body>
