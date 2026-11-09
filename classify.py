@@ -31,7 +31,8 @@ import yaml
 P = yaml.safe_load(open('patterns.yaml'))
 
 stock = re.compile(
-    r'(?:' + '|'.join(re.escape(w) for w in P['incidental']['stock_phrases']) + r')\s+permitting')
+    r'\b(?:' + '|'.join(re.escape(w) for w in P['incidental']['stock_phrases']) + r')\s+permitting')
+stock_at_end = re.compile(stock.pattern + r'$')
 verb = re.compile(
     r'permitting\s+(?:' + '|'.join(re.escape(w) for w in P['incidental']['verb_following_words']) + r')\b')
 overrides = [o.lower() for o in P['real_overrides']]
@@ -48,11 +49,16 @@ def classify_word_contexts(contexts):
     incidental_hits = set()
     all_incidental = True
     for c in contexts:
-        m = stock.search(c) or verb.search(c)
-        if m:
-            incidental_hits.add(m.group(0))
-        else:
+        if 'permitting' not in c:
             all_incidental = False
+        # A context window can hold several mentions; each one has to be
+        # incidental on its own, not just the first one found.
+        for occ in re.finditer(r'permitting', c):
+            m = stock_at_end.search(c[:occ.end()]) or verb.match(c, occ.start())
+            if m:
+                incidental_hits.add(m.group(0))
+            else:
+                all_incidental = False
     if contexts and all_incidental:
         return 'probably incidental', 'only matched: ' + '; '.join(sorted(incidental_hits))
     return 'real mention', 'mention(s) not matching any incidental pattern' + (
