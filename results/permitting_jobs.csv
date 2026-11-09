@@ -1621,7 +1621,7 @@ year,month,title,agency,department,series,mention_type,link,usajobsControlNumber
 2019,2019_03,REALTY SPECIALIST (CONTRACTS MANAGEMENT),"Interior, Bureau of Indian Affairs",Department of the Interior,1170,real mention,https://www.usajobs.gov/job/527573900,527573900
 2019,2019_03,Senior Policy Analyst,Bureau of Land Management,Department of the Interior,0301,real mention,https://www.usajobs.gov/job/527856900,527856900
 2019,2019_03,"Supervisory Contract Specialist, NB-1102-VI",Office of the Comptroller of the Currency,Department of the Treasury,1102,probably incidental,https://www.usajobs.gov/job/527620200,527620200
-2019,2019_03,Supervisory Electricity Policy Analyst,Other Agencies and Independent Organizations,Department of Energy,0301,probably incidental,https://www.usajobs.gov/job/527107300,527107300
+2019,2019_03,Supervisory Electricity Policy Analyst,Other Agencies and Independent Organizations,Department of Energy,0301,real mention,https://www.usajobs.gov/job/527107300,527107300
 2019,2019_03,"Supervisory Life Scientist, Physical Scientist, Environmental Engineer",Environmental Protection Agency,Other Agencies and Independent Organizations,0401 | 1301 | 0819,real mention,https://www.usajobs.gov/job/525810200,525810200
 2019,2019_03,Supervisory Permit Program Specialist (Backcountry/AIS),National Park Service,Department of the Interior,1101,real mention,https://www.usajobs.gov/job/526808000,526808000
 2019,2019_03,"Supervisory Program Analyst, ZA-0343-5 (DE/CR)",National Oceanic and Atmospheric Administration,Department of Commerce,0343,real mention,https://www.usajobs.gov/job/526783900,526783900
@@ -2220,8 +2220,8 @@ year,month,title,agency,department,series,mention_type,link,usajobsControlNumber
 2019,2019_10,"Secretary (Office Automation), NB-0318-IV",Office of the Comptroller of the Currency,Department of the Treasury,0318,probably incidental,https://www.usajobs.gov/job/549846900,549846900
 2019,2019_10,Senior Fish and WIldlife Biologist,U.S. Fish and Wildlife Service,Department of the Interior,0401,real mention,https://www.usajobs.gov/job/549105000,549105000
 2019,2019_10,Supervisory Biologist/General Engineer/Physical Scientist,Environmental Protection Agency,Other Agencies and Independent Organizations,1301 | 0801 | 0401,real mention,https://www.usajobs.gov/job/548793800,548793800
-2019,2019_10,Supervisory Electricity Policy Analyst,Other Agencies and Independent Organizations,Department of Energy,0301,probably incidental,https://www.usajobs.gov/job/548056400,548056400
-2019,2019_10,Supervisory Electricity Policy Analyst,Other Agencies and Independent Organizations,Department of Energy,0301,probably incidental,https://www.usajobs.gov/job/548046800,548046800
+2019,2019_10,Supervisory Electricity Policy Analyst,Other Agencies and Independent Organizations,Department of Energy,0301,real mention,https://www.usajobs.gov/job/548056400,548056400
+2019,2019_10,Supervisory Electricity Policy Analyst,Other Agencies and Independent Organizations,Department of Energy,0301,real mention,https://www.usajobs.gov/job/548046800,548046800
 2019,2019_10,Supervisory Environmental Protection Specialist,Army Installation Management Command,Department of the Army,0028,real mention,https://www.usajobs.gov/job/548502700,548502700
 2019,2019_10,Supervisory Human Resources Specialist - NB-0201-VI (Temporary Promotion or Detail NTE 6 Months),Office of the Comptroller of the Currency,Department of the Treasury,0201,probably incidental,https://www.usajobs.gov/job/550223100,550223100
 2019,2019_10,Supervisory IT Specialist,Office of the Comptroller of the Currency,Department of the Treasury,2210,probably incidental,https://www.usajobs.gov/job/550297400,550297400
@@ -2395,7 +2395,7 @@ year,month,title,agency,department,series,mention_type,link,usajobsControlNumber
 2020,2020_01,Plant Protection Technician (Domestic),Animal and Plant Health Inspection Service,Department of Agriculture,0421,real mention,https://www.usajobs.gov/job/555551100,555551100
 2020,2020_01,Plant Protection Technician (Domestic),Animal and Plant Health Inspection Service,Department of Agriculture,0421,real mention,https://www.usajobs.gov/job/555527400,555527400
 2020,2020_01,Plant Protection and Quarantine Officer (Plant Health Safeguarding Specialist),Animal and Plant Health Inspection Service,Department of Agriculture,0401,real mention,https://www.usajobs.gov/job/557456500,557456500
-2020,2020_01,Program Analyst,Other Agencies and Independent Organizations,Department of Energy,0343,probably incidental,https://www.usajobs.gov/job/558227100,558227100
+2020,2020_01,Program Analyst,Other Agencies and Independent Organizations,Department of Energy,0343,real mention,https://www.usajobs.gov/job/558227100,558227100
 2020,2020_01,Program Specialist (Permitting Specialist),Animal and Plant Health Inspection Service,Department of Agriculture,0301,real mention,https://www.usajobs.gov/job/556883000,556883000
 2020,2020_01,Project Manager (DEU-JRS),Bureau of Reclamation,Department of the Interior,0301,real mention,https://www.usajobs.gov/job/558260600,558260600
 2020,2020_01,Project Manager (MPP-JRS),Bureau of Reclamation,Department of the Interior,0301,real mention,https://www.usajobs.gov/job/558260900,558260900
@@ -3089,8 +3089,8 @@ year,month,title,agency,department,series,mention_type,link,usajobsControlNumber
 2020,2020_10,"Licensing Manager, NB-570-VI.2",Office of the Comptroller of the Currency,Department of the Treasury,0570,probably incidental,https://www.usajobs.gov/job/582472900,582472900
 2020,2020_10,Life Scientist/Environmental Engineer/Physical Scientist,Environmental Protection Agency,Other Agencies and Independent Organizations,1301 | 0819 | 0401,real mention,https://www.usajobs.gov/job/582115400,582115400
 2020,2020_10,Life Scientist/Physical Scientist/Environment Engineer,Environmental Protection Agency,Other Agencies and Independent Organizations,0401 | 1301 | 0819,real mention,https://www.usajobs.gov/job/582225100,582225100
-2020,2020_10,Management & Program Analyst,Other Agencies and Independent Organizations,Department of Energy,0343,probably incidental,https://www.usajobs.gov/job/582648800,582648800
-2020,2020_10,Management & Program Analyst,Other Agencies and Independent Organizations,Department of Energy,0343,probably incidental,https://www.usajobs.gov/job/582722300,582722300
+2020,2020_10,Management & Program Analyst,Other Agencies and Independent Organizations,Department of Energy,0343,real mention,https://www.usajobs.gov/job/582648800,582648800
+2020,2020_10,Management & Program Analyst,Other Agencies and Independent Organizations,Department of Energy,0343,real mention,https://www.usajobs.gov/job/582722300,582722300
 2020,2020_10,"Management and Program Analyst, NB-343-IV",Office of the Comptroller of the Currency,Department of the Treasury,0343,probably incidental,https://www.usajobs.gov/job/583244800,583244800
 2020,2020_10,"Management and Program Analyst, NB-343-IV",Office of the Comptroller of the Currency,Department of the Treasury,0343,probably incidental,https://www.usajobs.gov/job/583313700,583313700
 2020,2020_10,"Management and Program Analyst, NB-343-IV",Office of the Comptroller of the Currency,Department of the Treasury,0343,probably incidental,https://www.usajobs.gov/job/583246100,583246100
