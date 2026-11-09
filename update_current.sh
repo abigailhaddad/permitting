@@ -19,7 +19,12 @@ mkdir -p cache
 while IFS= read -r url; do
   f="cache/$(basename "$url")"
   echo "syncing $f ..."
-  curl -sS $([ -f "$f" ] && echo -z "$f") -o "$f" "$url" || { echo "download failed: $url" >&2; exit 1; }
+  # --fail: an HTTP error must not write its error page over the cached parquet.
+  # Download to a .part file and move it into place only when curl succeeded
+  # (a 304 Not Modified writes nothing, so the cached file is kept as is).
+  rm -f "$f.part"
+  curl -fsS $([ -f "$f" ] && echo -z "$f") -o "$f.part" "$url" || { rm -f "$f.part"; echo "download failed: $url" >&2; exit 1; }
+  [ -f "$f.part" ] && mv "$f.part" "$f"
 done < reference/r2_current_urls.txt
 
 RX=$(python3 build_rx.py)
